@@ -41,9 +41,9 @@ export default function MarketsPage() {
 
   return (
     <Card className="w-full overflow-hidden">
-      <CardHeader>
+      {/* <CardHeader>
         <CardTitle>Cryptocurrency Markets</CardTitle>
-      </CardHeader>
+      </CardHeader> */}
       <CardContent>
         <div className="overflow-auto">
           <CryptoTable
