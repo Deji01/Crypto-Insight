@@ -3,6 +3,7 @@ import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, ArrowDownRight, TrendingUp } from 'lucide-react';
+import LoadingSpinner from './LoadingSpinner';
 
 
 interface Data {
@@ -37,7 +38,10 @@ export default function TrendingPage() {
     queryFn: fetchTrendingCryptos
   })
 
-  if (isLoading) return <div className="flex justify-center items-center h-64">Loading trending assets...</div>
+  if (isLoading) return <div className="flex justify-center items-center h-64">
+    <LoadingSpinner />
+  </div>
+  
   if (isError) return <div className="flex justify-center items-center h-64">Error loading trending assets. Please try again later.</div>
 
   return (

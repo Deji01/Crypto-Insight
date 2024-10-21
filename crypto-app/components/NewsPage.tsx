@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import CryptoTicker from "@/components/CryptoTicker";
+import LoadingSpinner from './LoadingSpinner';
 
 const fetchCryptoNews = async () => {
   const response = await axios.get('https://cointelegraph.com/rss')
@@ -26,6 +27,13 @@ export default function NewsPage() {
     queryKey: ['cryptoNews'],
     queryFn: fetchCryptoNews
   })
+
+  if (isLoading) return <div className="flex justify-center items-center h-64">
+    <LoadingSpinner />
+  </div>
+
+  if (isError) return <div className="flex justify-center items-center h-64">Error fetching news. Please try again later.</div>
+
 
   return (
     <div className="space-y-4">
