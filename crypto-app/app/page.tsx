@@ -1,5 +1,9 @@
-import Component from "./CryptoDashboard";
+import CryptoDashboard from "@/components/CryptoDashboard";
 
 export default function Home() {
-  return <Component />
+  return (
+    <main>
+      <CryptoDashboard />
+    </main>
+  )
 }
