@@ -6,7 +6,6 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import LoadingSpinner from "./LoadingSpinner";
-import { FixedSizeList as List } from 'react-window';
 
 interface SortConfig {
   key: string
@@ -25,7 +24,7 @@ interface CryptoTableProps {
 export default function CryptoTable({ cryptos, isLoading, onAssetClick, currentPage }: CryptoTableProps) {
   const [sortConfig, setSortConfig] = useState({ key: 'market_cap', direction: 'descending' })
   const scrollAreaRef = useRef<HTMLDivElement>(null)
-
+  
   const sortData = (key: string) => {
     let direction = 'ascending'
     if (sortConfig.key === key && sortConfig.direction === 'ascending') {
@@ -71,50 +70,41 @@ export default function CryptoTable({ cryptos, isLoading, onAssetClick, currentP
     )
   }
 
-  const Row = ({ index, style }: { index: number; style: React.CSSProperties }) => {
-    const crypto = sortedCryptos[index]
-    return (
-      <TableRow key={crypto.id} style={style} onClick={() => onAssetClick(crypto.id)}>
-        <TableHead className="w-[60px]">Rank</TableHead>
-        <TableHead className="w-[200px]">Name</TableHead>
-        <TableHead className="w-[100px]">Ticker</TableHead>
-        <TableHead className="text-right w-[120px]">
-          <Button variant="ghost" onClick={() => sortData('current_price')}>
-            Price <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        </TableHead>
-        <TableHead className="text-right w-[120px]">
-          <Button variant="ghost" onClick={() => sortData('price_change_percentage_24h')}>
-            24h % <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        </TableHead>
-        <TableHead className="text-right w-[200px]">
-          <Button variant="ghost" onClick={() => sortData('market_cap')}>
-            Market Cap <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        </TableHead>
-        <TableHead className="text-right w-[200px]">
-          <Button variant="ghost" onClick={() => sortData('total_volume')}>
-            Volume (24h) <ArrowUpDown className="ml-2 h-4 w-4" />
-          </Button>
-        </TableHead>
-        <TableHead className="text-right w-[200px]">Circulating Supply</TableHead>
-        <TableHead className="text-right w-[200px]">Max Supply</TableHead>
-      </TableRow>
-    )
-  }
-
   return (
     <div className="overflow-auto max-w-full">
       <ScrollArea ref={scrollAreaRef} className="h-[600px] w-full rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
-
+              <TableHead className="w-[60px]">Rank</TableHead>
+              <TableHead className="w-[200px]">Name</TableHead>
+              <TableHead className="w-[100px]">Ticker</TableHead>
+              <TableHead className="text-right w-[120px]">
+                <Button variant="ghost" onClick={() => sortData('current_price')}>
+                  Price <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead className="text-right w-[120px]">
+                <Button variant="ghost" onClick={() => sortData('price_change_percentage_24h')}>
+                  24h % <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead className="text-right w-[200px]">
+                <Button variant="ghost" onClick={() => sortData('market_cap')}>
+                  Market Cap <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead className="text-right w-[200px]">
+                <Button variant="ghost" onClick={() => sortData('total_volume')}>
+                  Volume (24h) <ArrowUpDown className="ml-2 h-4 w-4" />
+                </Button>
+              </TableHead>
+              <TableHead className="text-right w-[200px]">Circulating Supply</TableHead>
+              <TableHead className="text-right w-[200px]">Max Supply</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {/* {isLoading ? (
+            {isLoading ? (
               <TableRow>
                 <TableCell colSpan={9} className="text-center">Loading...</TableCell>
               </TableRow>
@@ -139,15 +129,7 @@ export default function CryptoTable({ cryptos, isLoading, onAssetClick, currentP
                   <TableCell className="text-right">{crypto.max_supply ? crypto.max_supply.toLocaleString() : 'N/A'} {crypto.symbol.toUpperCase()}</TableCell>
                 </TableRow>
               ))
-            )} */}
-            <List
-              height={550}
-              itemCount={sortedCryptos.length}
-              itemSize={50}
-              width="100%"
-            >
-              {Row}
-            </List>
+            )}
           </TableBody>
         </Table>
         <ScrollBar orientation="horizontal" />
