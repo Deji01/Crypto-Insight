@@ -1,10 +1,10 @@
 "use client"
 
-import { useState, useEffect, useRef, useMemo } from "react";
+import { useState, useMemo } from "react";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
+import { ScrollBar } from "@/components/ui/scroll-area";
 import LoadingSpinner from "./LoadingSpinner";
 
 interface SortConfig {
@@ -23,7 +23,6 @@ interface CryptoTableProps {
 
 export default function CryptoTable({ cryptos, isLoading, onAssetClick, currentPage }: CryptoTableProps) {
   const [sortConfig, setSortConfig] = useState({ key: 'market_cap', direction: 'descending' })
-  const scrollAreaRef = useRef<HTMLDivElement>(null)
   
   const sortData = (key: string) => {
     let direction = 'ascending'
@@ -46,22 +45,6 @@ export default function CryptoTable({ cryptos, isLoading, onAssetClick, currentP
     })
   }, [cryptos, sortConfig])
 
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (scrollAreaRef.current) {
-        const scrollAmount = 100 // Adjust this value as needed
-        if (e.key === 'ArrowLeft') {
-          scrollAreaRef.current.scrollLeft -= scrollAmount
-        } else if (e.key === 'ArrowRight') {
-          scrollAreaRef.current.scrollLeft += scrollAmount
-        }
-      }
-    }
-
-    window.addEventListener('keydown', handleKeyDown)
-    return () => window.removeEventListener('keydown', handleKeyDown)
-  }, [])
-
   if (isLoading) {
     return (
       <div className="h-[600px]">
@@ -72,7 +55,6 @@ export default function CryptoTable({ cryptos, isLoading, onAssetClick, currentP
 
   return (
     <div className="overflow-auto max-w-full">
-      <ScrollArea ref={scrollAreaRef} className="h-[600px] w-full rounded-md border">
         <Table>
           <TableHeader>
             <TableRow>
@@ -133,7 +115,6 @@ export default function CryptoTable({ cryptos, isLoading, onAssetClick, currentP
           </TableBody>
         </Table>
         <ScrollBar orientation="horizontal" />
-      </ScrollArea>
     </div>
   )
 }
