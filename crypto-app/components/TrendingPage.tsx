@@ -5,7 +5,6 @@ import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, ArrowDownRight, TrendingUp } from 'lucide-react';
 import LoadingSpinner from './LoadingSpinner';
 
-
 interface Data {
   price_change_percentage_24h: PriceChange
 }
@@ -28,7 +27,7 @@ interface Crypto {
 }
 
 const fetchTrendingCryptos = async () => {
-  const response = await axios.get(process.env.TRENDING_URL!)
+  const response = await axios.get('/api/trending')
   return response.data.coins
 }
 
@@ -41,7 +40,7 @@ export default function TrendingPage() {
   if (isLoading) return <div className="flex justify-center items-center h-64">
     <LoadingSpinner />
   </div>
-  
+
   if (isError) return <div className="flex justify-center items-center h-64">Error loading trending assets. Please try again later.</div>
 
   return (

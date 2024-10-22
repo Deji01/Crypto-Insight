@@ -1,11 +1,10 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { Card, CardContent} from "@/components/ui/card";
+import { Card, CardContent } from "@/components/ui/card";
 import CryptoTable from '../components/CryptoTable';
 import Pagination from '../components/Pagination';
 import AssetDetailsPage from './AssetDetailsPage';
-
 
 interface Data {
   price_change_percentage_24h: PriceChange
@@ -29,7 +28,7 @@ interface Crypto {
 }
 
 const fetchCryptos = async (page = 1, perPage = 50) => {
-  const response = await axios.get(process.env.MARKET_URL!, {
+  const response = await axios.get('/api/crypto', {
     params: {
       vs_currency: 'usd',
       order: 'market_cap_desc',
@@ -78,17 +77,12 @@ export default function MarketsPage() {
     });
   };
 
-
-
   if (selectedAsset) {
     return <AssetDetailsPage assetId={selectedAsset} onBackClick={handleBackClick} />
   }
 
   return (
     <Card className="w-full overflow-hidden">
-      {/* <CardHeader>
-        <CardTitle>Cryptocurrency Markets</CardTitle>
-      </CardHeader> */}
       <CardContent>
         <div className="overflow-auto">
           <CryptoTable

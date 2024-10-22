@@ -25,21 +25,11 @@ interface NewsAPIResponse {
   articles: NewsArticle[];
 }
 
-const API_KEY = process.env.NEWS_API_KEY!
-
 const fetchCryptoNews = async (page: number = 1, pageSize: number = 10): Promise<NewsArticle[]> => {
-  const url = process.env.NEWS_URL!
-  const params = {
-    q: 'cryptocurrency',
-    sortBy: 'publishedAt',
-    apiKey: API_KEY,
-    language: 'en',
-    page,
-    pageSize
-  }
-
   try {
-    const response = await axios.get<NewsAPIResponse>(url, { params })
+    const response = await axios.get<NewsAPIResponse>('/api/news', {
+      params: { page, pageSize }
+    })
     if (response.data.status === 'ok') {
       return response.data.articles
     } else {

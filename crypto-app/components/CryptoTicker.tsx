@@ -12,7 +12,7 @@ interface Crypto {
 }
 
 const fetchTopCryptos = async (): Promise<Crypto[]> => {
-    const response = await axios.get(process.env.MARKETS_URL!, {
+    const response = await axios.get('/api/crypto', {
         params: {
             vs_currency: 'usd',
             order: 'market_cap_desc',
