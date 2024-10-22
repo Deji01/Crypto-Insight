@@ -21,12 +21,12 @@ interface OHLCData {
 }
 
 const fetchAssetDetails = async (id: string) => {
-    const response = await axios.get(`https://api.coingecko.com/api/v3/coins/${id}`);
+    const response = await axios.get(`${process.env.COIN_URL!}/${id}`);
     return response.data;
 };
 
 const fetchAssetChartData = async (id: string): Promise<CandlestickData[]> => {
-    const response = await axios.get(`https://api.coingecko.com/api/v3/coins/${id}/ohlc?vs_currency=usd&days=7`);
+    const response = await axios.get(`${process.env.COIN_URL!}/${id}/ohlc?vs_currency=usd&days=7`);
     return response.data.map(([timestamp, open, high, low, close]: [number, number, number, number, number]) => ({
         time: new Date(timestamp).toISOString().split('T')[0], // Use timestamp correctly
         open,

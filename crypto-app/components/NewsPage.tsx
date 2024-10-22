@@ -1,39 +1,75 @@
-import { useQuery } from '@tanstack/react-query';
+import { useState, useEffect } from 'react';
 import axios from 'axios';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import CryptoTicker from "@/components/CryptoTicker";
+import { Button } from "@/components/ui/button";
+import CryptoTicker from './CryptoTicker';
 import LoadingSpinner from './LoadingSpinner';
 
-const fetchCryptoNews = async () => {
-  const response = await axios.get('https://cointelegraph.com/rss')
-  const parser = new DOMParser()
-  const xmlDoc = parser.parseFromString(response.data, "text/xml")
-  const items = xmlDoc.getElementsByTagName("item")
-  const news = []
-  for (let i = 0; i < items.length; i++) {
-    const item = items[i]
-    news.push({
-      title: item.getElementsByTagName("title")[0]?.textContent || '',
-      link: item.getElementsByTagName("link")[0]?.textContent || '',
-      pubDate: item.getElementsByTagName("pubDate")[0]?.textContent || '',
-      description: item.getElementsByTagName("description")[0]?.textContent || '',
-    })
+interface NewsArticle {
+  source: {
+    id: string | null;
+    name: string;
+  };
+  author: string | null;
+  title: string;
+  description: string | null;
+  url: string;
+  urlToImage: string | null;
+  publishedAt: string;
+  content: string | null;
+}
+
+interface NewsAPIResponse {
+  status: string;
+  totalResults: number;
+  articles: NewsArticle[];
+}
+
+const API_KEY = process.env.NEWS_API_KEY!
+
+const fetchCryptoNews = async (page: number = 1, pageSize: number = 10): Promise<NewsArticle[]> => {
+  const url = process.env.NEWS_URL!
+  const params = {
+    q: 'cryptocurrency',
+    sortBy: 'publishedAt',
+    apiKey: API_KEY,
+    language: 'en',
+    page,
+    pageSize
   }
-  return news
+
+  try {
+    const response = await axios.get<NewsAPIResponse>(url, { params })
+    if (response.data.status === 'ok') {
+      return response.data.articles
+    } else {
+      throw new Error('Error fetching news data')
+    }
+  } catch (error) {
+    console.error('Error fetching news:', error)
+    return []
+  }
 }
 
 export default function NewsPage() {
-  const { data: cryptoNews, isLoading, isError } = useQuery({
-    queryKey: ['cryptoNews'],
-    queryFn: fetchCryptoNews
-  })
+  const [news, setNews] = useState<NewsArticle[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [page, setPage] = useState(1)
 
-  if (isLoading) return <div className="flex justify-center items-center h-64">
-    <LoadingSpinner />
-  </div>
+  useEffect(() => {
+    const loadNews = async () => {
+      setIsLoading(true)
+      const articles = await fetchCryptoNews(page)
+      setNews(prevNews => [...prevNews, ...articles])
+      setIsLoading(false)
+    }
 
-  if (isError) return <div className="flex justify-center items-center h-64">Error fetching news. Please try again later.</div>
+    loadNews()
+  }, [page])
 
+  const loadMore = () => {
+    setPage(prevPage => prevPage + 1)
+  }
 
   return (
     <div className="space-y-4">
@@ -43,26 +79,31 @@ export default function NewsPage() {
           <CardTitle>Crypto News</CardTitle>
         </CardHeader>
         <CardContent>
-          {isLoading ? (
-            <p>Loading news...</p>
-          ) : isError ? (
-            <p>Error fetching news. Please try again later.</p>
-          ) : cryptoNews && cryptoNews.length > 0 ? (
-            <ul className="space-y-4">
-              {cryptoNews.map((news, index) => (
-                <li key={index} className="border-b last:border-b-0 pb-4">
-                  <h3 className="font-medium text-lg">
-                    <a href={news.link} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                      {news.title}
-                    </a>
-                  </h3>
-                  <p className="text-sm text-gray-500 mt-1">{new Date(news.pubDate).toLocaleString()}</p>
-                  <p className="mt-2">{news.description}</p>
-                </li>
-              ))}
-            </ul>
+          {isLoading && news.length === 0 ? (
+            <LoadingSpinner />
           ) : (
-            <p>No news available at the moment.</p>
+            <>
+              <ul className="space-y-4">
+                {news.map((article, index) => (
+                  <li key={index} className="border-b last:border-b-0 pb-4">
+                    <h3 className="font-medium text-lg">
+                      <a href={article.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                        {article.title}
+                      </a>
+                    </h3>
+                    <p className="text-sm text-gray-500 mt-1">
+                      {article.source.name} - {new Date(article.publishedAt).toLocaleString()}
+                    </p>
+                    <p className="mt-2">{article.description}</p>
+                  </li>
+                ))}
+              </ul>
+              <div className="mt-4 text-center">
+                <Button onClick={loadMore} disabled={isLoading}>
+                  {isLoading ? <LoadingSpinner /> : 'Load More'}
+                </Button>
+              </div>
+            </>
           )}
         </CardContent>
       </Card>

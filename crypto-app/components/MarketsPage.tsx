@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
 import axios from 'axios';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent} from "@/components/ui/card";
 import CryptoTable from '../components/CryptoTable';
 import Pagination from '../components/Pagination';
 import AssetDetailsPage from './AssetDetailsPage';
@@ -29,7 +29,7 @@ interface Crypto {
 }
 
 const fetchCryptos = async (page = 1, perPage = 50) => {
-  const response = await axios.get('https://api.coingecko.com/api/v3/coins/markets', {
+  const response = await axios.get(process.env.MARKET_URL!, {
     params: {
       vs_currency: 'usd',
       order: 'market_cap_desc',
@@ -94,7 +94,6 @@ export default function MarketsPage() {
           <CryptoTable
             cryptos={cryptos || []}
             isLoading={isLoading}
-            onAssetClick={handleAssetClick}
             currentPage={currentPage}
             onSort={handleSort}
             sortConfig={sortConfig}

@@ -28,7 +28,7 @@ interface Crypto {
 }
 
 const fetchTrendingCryptos = async () => {
-  const response = await axios.get('https://api.coingecko.com/api/v3/search/trending')
+  const response = await axios.get(process.env.TRENDING_URL!)
   return response.data.coins
 }
 
