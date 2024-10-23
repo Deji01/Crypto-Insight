@@ -81,6 +81,8 @@ export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoT
                   Volume (24h) <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
               </TableHead>
+              <TableHead className="text-right w-[200px]">Circulating Supply</TableHead>
+              {/* <TableHead className="text-right w-[200px]">Max Supply</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -107,6 +109,8 @@ export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoT
                   </TableCell>
                   <TableCell className="text-right">${crypto.market_cap.toLocaleString()}</TableCell>
                   <TableCell className="text-right">${crypto.total_volume.toLocaleString()}</TableCell>
+                  <TableCell className="text-right">{crypto.circulating_supply.toLocaleString()} {crypto.symbol.toUpperCase()}</TableCell>
+                  {/* <TableCell className="text-right">{crypto.max_supply ? crypto.max_supply.toLocaleString() : 'N/A'} {crypto.symbol.toUpperCase()}</TableCell> */}
                 </TableRow>
               ))
             )}
