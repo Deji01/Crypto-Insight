@@ -5,7 +5,7 @@ import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
-import LoadingSpinner from "./LoadingSpinner";
+import Skeleton from "./Skeleton";
 
 interface SortConfig {
   key: string
@@ -44,12 +44,46 @@ export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoT
     })
   }, [cryptos, sortConfig])
 
+  // Skeleton loading state
+  const renderSkeletonRows = () => (
+    [...Array(10)].map((_, index) => (
+      <TableRow key={index}>
+        <TableCell><Skeleton className="h-6 w-8" /></TableCell>
+        <TableCell><Skeleton className="h-6 w-24" /></TableCell>
+        <TableCell><Skeleton className="h-6 w-10" /></TableCell>
+        <TableCell className="text-right"><Skeleton className="h-6 w-12" /></TableCell>
+        <TableCell className="text-right"><Skeleton className="h-6 w-12" /></TableCell>
+        <TableCell className="text-right"><Skeleton className="h-6 w-20" /></TableCell>
+        <TableCell className="text-right"><Skeleton className="h-6 w-20" /></TableCell>
+        <TableCell className="text-right"><Skeleton className="h-6 w-24" /></TableCell>
+      </TableRow>
+    ))
+  )
+
   if (isLoading) {
     return (
-      <div className="h-[600px]">
-        <LoadingSpinner />
+      <div className="flex justify-center items-center overflow-auto max-w-full">
+        <Table>
+          <ScrollArea>
+            <TableHeader>
+              <TableRow>
+                <TableHead className="w-[60px]">Rank</TableHead>
+                <TableHead className="w-[200px]">Name</TableHead>
+                <TableHead className="w-[100px]">Ticker</TableHead>
+                <TableHead className="text-right w-[120px]">Price</TableHead>
+                <TableHead className="text-right w-[120px]">24h %</TableHead>
+                <TableHead className="text-right w-[200px]">Market Cap</TableHead>
+                <TableHead className="text-right w-[200px]">Volume (24h)</TableHead>
+                <TableHead className="text-right w-[200px]">Circulating Supply</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {renderSkeletonRows()} {/* Render skeleton rows when loading */}
+            </TableBody>
+          </ScrollArea>
+        </Table>
       </div>
-    )
+    );
   }
 
   return (
@@ -82,38 +116,28 @@ export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoT
                 </Button>
               </TableHead>
               <TableHead className="text-right w-[200px]">Circulating Supply</TableHead>
-              {/* <TableHead className="text-right w-[200px]">Max Supply</TableHead> */}
             </TableRow>
           </TableHeader>
           <TableBody>
-            {isLoading ? (
-              <TableRow>
-                <TableCell colSpan={9} className="text-center">
-                  <LoadingSpinner />
+            {sortedCryptos.map((crypto, index) => (
+              <TableRow key={crypto.id}>
+                <TableCell className="font-medium">{(currentPage - 1) * 50 + index + 1}</TableCell>
+                <TableCell className="font-medium">
+                  <div className="flex items-center">
+                    <img src={crypto.image} alt={crypto.name} className="w-6 h-6 mr-2" />
+                    <span>{crypto.name}</span>
+                  </div>
                 </TableCell>
+                <TableCell>{crypto.symbol.toUpperCase()}</TableCell>
+                <TableCell className="text-right">${crypto.current_price.toLocaleString()}</TableCell>
+                <TableCell className={`text-right ${crypto.price_change_percentage_24h > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {crypto.price_change_percentage_24h.toFixed(2)}%
+                </TableCell>
+                <TableCell className="text-right">${crypto.market_cap.toLocaleString()}</TableCell>
+                <TableCell className="text-right">${crypto.total_volume.toLocaleString()}</TableCell>
+                <TableCell className="text-right">{crypto.circulating_supply.toLocaleString()} {crypto.symbol.toUpperCase()}</TableCell>
               </TableRow>
-            ) : (
-              sortedCryptos.map((crypto, index) => (
-                <TableRow key={crypto.id}>
-                  <TableCell className="font-medium">{(currentPage - 1) * 50 + index + 1}</TableCell>
-                  <TableCell className="font-medium">
-                    <div className="flex items-center">
-                      <img src={crypto.image} alt={crypto.name} className="w-6 h-6 mr-2" />
-                      <span>{crypto.name}</span>
-                    </div>
-                  </TableCell>
-                  <TableCell>{crypto.symbol.toUpperCase()}</TableCell>
-                  <TableCell className="text-right">${crypto.current_price.toLocaleString()}</TableCell>
-                  <TableCell className={`text-right ${crypto.price_change_percentage_24h > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                    {crypto.price_change_percentage_24h.toFixed(2)}%
-                  </TableCell>
-                  <TableCell className="text-right">${crypto.market_cap.toLocaleString()}</TableCell>
-                  <TableCell className="text-right">${crypto.total_volume.toLocaleString()}</TableCell>
-                  <TableCell className="text-right">{crypto.circulating_supply.toLocaleString()} {crypto.symbol.toUpperCase()}</TableCell>
-                  {/* <TableCell className="text-right">{crypto.max_supply ? crypto.max_supply.toLocaleString() : 'N/A'} {crypto.symbol.toUpperCase()}</TableCell> */}
-                </TableRow>
-              ))
-            )}
+            ))}
           </TableBody>
           <ScrollBar orientation="horizontal" />
         </ScrollArea>
