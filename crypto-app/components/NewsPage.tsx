@@ -4,7 +4,7 @@ import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/com
 import { Button } from "@/components/ui/button";
 import CryptoTicker from './CryptoTicker';
 import LoadingSpinner from './LoadingSpinner';
-import Skeleton from './Skeleton'; 
+import Skeleton from './Skeleton';
 
 // NewsArticle Interface
 interface NewsArticle {
@@ -39,15 +39,17 @@ export default function NewsPage() {
   const [news, setNews] = useState<NewsArticle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [page, setPage] = useState(1);
-  const [isLoadingMore, setIsLoadingMore] = useState(false); // Manage 'Load More' spinner
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
 
-  // Fetch news on page load or page change
+  const placeholderImage = "https://images.unsplash.com/photo-1643488072086-9d7318c0a04b?w=500&auto=format&fit=crop&q=60&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8MTJ8fGNyeXB0byUyMG5ld3N8ZW58MHx8MHx8fDA%3D"; // Placeholder
+
+  // Fetch news on page load
   useEffect(() => {
     const loadNews = async () => {
       setIsLoading(true);
       try {
-        const articles = await fetchCryptoNews(page);
-        setNews((prevNews) => [...prevNews, ...articles]);
+        const articles = await fetchCryptoNews(1); // Initial fetch with page 1
+        setNews(articles);
       } catch (error) {
         console.error('Error fetching news:', error);
       } finally {
@@ -55,13 +57,19 @@ export default function NewsPage() {
       }
     };
     loadNews();
-  }, [page]);
+  }, []);
 
-  // Load More Button Handler
-  const loadMore = () => {
+  const loadMore = async () => {
     setIsLoadingMore(true);
-    setPage((prevPage) => prevPage + 1);
-    setIsLoadingMore(false);
+    try {
+      const articles = await fetchCryptoNews(page + 1);
+      setNews((prevNews) => [...prevNews, ...articles]);
+      setPage((prevPage) => prevPage + 1);
+    } catch (error) {
+      console.error('Error fetching more news:', error);
+    } finally {
+      setIsLoadingMore(false);
+    }
   };
 
   return (
@@ -93,17 +101,15 @@ export default function NewsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {news.map((article, index) => (
                   <Card key={index} className="overflow-hidden flex flex-col">
-                    {article.urlToImage ? (
-                      <img
-                        src={article.urlToImage}
-                        alt={`Image for ${article.title}`}
-                        className="w-full h-48 object-cover"
-                      />
-                    ) : (
-                      <div className="bg-gray-200 w-full h-48 flex justify-center items-center text-gray-500">
-                        No Image
-                      </div>
-                    )}
+                    <img
+                      src={article.urlToImage || placeholderImage} // Initial fallback if URL is null
+                      onError={(e) => {
+                        // Set the placeholder image if the image fails to load
+                        e.currentTarget.src = placeholderImage;
+                      }}
+                      alt={`Image for ${article.title}`}
+                      className="w-full h-48 object-cover"
+                    />
                     <CardContent className="flex-grow flex flex-col p-4">
                       <h3 className="font-bold text-lg mb-2 line-clamp-2">
                         <a
@@ -154,3 +160,4 @@ export default function NewsPage() {
     </div>
   );
 }
+
