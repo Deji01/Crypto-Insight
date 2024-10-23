@@ -1,10 +1,12 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import CryptoTicker from './CryptoTicker';
 import LoadingSpinner from './LoadingSpinner';
+import Skeleton from './Skeleton'; 
 
+// NewsArticle Interface
 interface NewsArticle {
   source: {
     id: string | null;
@@ -19,78 +21,130 @@ interface NewsArticle {
   content: string | null;
 }
 
-interface NewsAPIResponse {
-  status: string;
-  totalResults: number;
-  articles: NewsArticle[];
-}
-
-const fetchCryptoNews = async (page: number = 1, pageSize: number = 10): Promise<NewsArticle[]> => {
+// Fetch Crypto News Function
+const fetchCryptoNews = async (page: number): Promise<NewsArticle[]> => {
   try {
-    const response = await axios.get<NewsAPIResponse>('/api/news', {
-      params: { page, pageSize }
-    })
-    if (response.data.status === 'ok') {
-      return response.data.articles
-    } else {
-      throw new Error('Error fetching news data')
-    }
+    const response = await axios.get('/api/news', {
+      params: { page, pageSize: 10 },
+    });
+    return response.data.articles;
   } catch (error) {
-    console.error('Error fetching news:', error)
-    return []
+    console.error('Error fetching news:', error);
+    return [];
   }
-}
+};
 
+// NewsPage Component
 export default function NewsPage() {
-  const [news, setNews] = useState<NewsArticle[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [page, setPage] = useState(1)
+  const [news, setNews] = useState<NewsArticle[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [page, setPage] = useState(1);
+  const [isLoadingMore, setIsLoadingMore] = useState(false); // Manage 'Load More' spinner
 
+  // Fetch news on page load or page change
   useEffect(() => {
     const loadNews = async () => {
-      setIsLoading(true)
-      const articles = await fetchCryptoNews(page)
-      setNews(prevNews => [...prevNews, ...articles])
-      setIsLoading(false)
-    }
+      setIsLoading(true);
+      try {
+        const articles = await fetchCryptoNews(page);
+        setNews((prevNews) => [...prevNews, ...articles]);
+      } catch (error) {
+        console.error('Error fetching news:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    loadNews();
+  }, [page]);
 
-    loadNews()
-  }, [page])
-
+  // Load More Button Handler
   const loadMore = () => {
-    setPage(prevPage => prevPage + 1)
-  }
+    setIsLoadingMore(true);
+    setPage((prevPage) => prevPage + 1);
+    setIsLoadingMore(false);
+  };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       <CryptoTicker />
       <Card>
         <CardHeader>
-          <CardTitle>Crypto News</CardTitle>
+          <CardTitle className="text-3xl font-bold">Crypto News</CardTitle>
+          <CardDescription>Stay updated with the latest cryptocurrency news</CardDescription>
         </CardHeader>
         <CardContent>
           {isLoading && news.length === 0 ? (
-            <LoadingSpinner />
+            // Skeleton Loading State
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {[...Array(6)].map((_, index) => (
+                <Card key={index} className="overflow-hidden flex flex-col">
+                  <Skeleton className="w-full h-48" />
+                  <CardContent className="flex-grow flex flex-col p-4">
+                    <Skeleton className="h-6 w-3/4 mb-2" />
+                    <Skeleton className="h-4 w-1/2 mb-2" />
+                    <Skeleton className="h-4 w-full mb-4" />
+                    <Skeleton className="h-10 w-full mt-auto" />
+                  </CardContent>
+                </Card>
+              ))}
+            </div>
           ) : (
             <>
-              <ul className="space-y-4">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {news.map((article, index) => (
-                  <li key={index} className="border-b last:border-b-0 pb-4">
-                    <h3 className="font-medium text-lg">
-                      <a href={article.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
-                        {article.title}
-                      </a>
-                    </h3>
-                    <p className="text-sm text-gray-500 mt-1">
-                      {article.source.name} - {new Date(article.publishedAt).toLocaleString()}
-                    </p>
-                    <p className="mt-2">{article.description}</p>
-                  </li>
+                  <Card key={index} className="overflow-hidden flex flex-col">
+                    {article.urlToImage ? (
+                      <img
+                        src={article.urlToImage}
+                        alt={`Image for ${article.title}`}
+                        className="w-full h-48 object-cover"
+                      />
+                    ) : (
+                      <div className="bg-gray-200 w-full h-48 flex justify-center items-center text-gray-500">
+                        No Image
+                      </div>
+                    )}
+                    <CardContent className="flex-grow flex flex-col p-4">
+                      <h3 className="font-bold text-lg mb-2 line-clamp-2">
+                        <a
+                          href={article.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="hover:underline"
+                          aria-label={`Read more about ${article.title}`}
+                        >
+                          {article.title}
+                        </a>
+                      </h3>
+                      <p className="text-sm text-muted-foreground mb-2">
+                        {article.source.name} - {new Date(article.publishedAt).toLocaleString()}
+                      </p>
+                      <p className="text-sm line-clamp-3 mb-4 flex-grow">
+                        {article.description ? article.description : 'No description available'}
+                      </p>
+                      <Button
+                        asChild
+                        variant="outline"
+                        size="sm"
+                        className="w-full mt-auto"
+                        aria-label="Read more about this article"
+                      >
+                        <a href={article.url} target="_blank" rel="noopener noreferrer">
+                          Read More
+                        </a>
+                      </Button>
+                    </CardContent>
+                  </Card>
                 ))}
-              </ul>
-              <div className="mt-4 text-center">
-                <Button onClick={loadMore} disabled={isLoading}>
-                  {isLoading ? <LoadingSpinner /> : 'Load More'}
+              </div>
+              <div className="mt-8 text-center">
+                <Button
+                  onClick={loadMore}
+                  disabled={isLoadingMore}
+                  size="lg"
+                  aria-live="polite"
+                >
+                  {isLoadingMore ? <LoadingSpinner /> : 'Load More News'}
                 </Button>
               </div>
             </>
@@ -98,5 +152,5 @@ export default function NewsPage() {
         </CardContent>
       </Card>
     </div>
-  )
+  );
 }
