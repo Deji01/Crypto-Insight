@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import axios from 'axios'
 
-const NEWS_URL = process.env.NEWS_API_URL!
+const NEWS_URL = process.env.NEWS_URL!
 const NEWS_API_KEY = process.env.NEWS_API_KEY!
 
 export async function GET(request: Request) {
