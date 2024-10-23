@@ -53,7 +53,7 @@ export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoT
   }
 
   return (
-    <div className="overflow-auto max-w-full">
+    <div className="flex justify-center items-center overflow-auto max-w-full">
       <Table>
         <ScrollArea>
           <TableHeader>
