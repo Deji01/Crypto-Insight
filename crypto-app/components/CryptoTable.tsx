@@ -8,43 +8,32 @@ import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Skeleton from "./Skeleton";
 
 interface SortConfig {
-  key: string
-  direction: string
+  key: string;
+  direction: string;
 }
 
 interface CryptoTableProps {
-  cryptos: any[]
-  isLoading: boolean
-  currentPage: number
-  onSort: (key: string) => void
-  sortConfig: SortConfig
+  cryptos: any[];
+  isLoading: boolean;
+  currentPage: number;
+  onSort: (key: string) => void;
+  sortConfig: SortConfig;
 }
 
-export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoTableProps) {
-  const [sortConfig, setSortConfig] = useState({ key: 'market_cap', direction: 'descending' })
-
-  const sortData = (key: string) => {
-    let direction = 'ascending'
-    if (sortConfig.key === key && sortConfig.direction === 'ascending') {
-      direction = 'descending'
-    }
-    setSortConfig({ key, direction })
-  }
-
+export default function CryptoTable({ cryptos, isLoading, currentPage, onSort, sortConfig }: CryptoTableProps) {
   const sortedCryptos = useMemo(() => {
-    if (!cryptos) return []
+    if (!cryptos) return [];
     return [...cryptos].sort((a, b) => {
       if (a[sortConfig.key] < b[sortConfig.key]) {
-        return sortConfig.direction === 'ascending' ? -1 : 1
+        return sortConfig.direction === "ascending" ? -1 : 1;
       }
       if (a[sortConfig.key] > b[sortConfig.key]) {
-        return sortConfig.direction === 'ascending' ? 1 : -1
+        return sortConfig.direction === "ascending" ? 1 : -1;
       }
-      return 0
-    })
-  }, [cryptos, sortConfig])
+      return 0;
+    });
+  }, [cryptos, sortConfig]);
 
-  // Skeleton loading state
   const renderSkeletonRows = () => (
     [...Array(10)].map((_, index) => (
       <TableRow key={index}>
@@ -58,7 +47,7 @@ export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoT
         <TableCell className="text-right"><Skeleton className="h-6 w-24" /></TableCell>
       </TableRow>
     ))
-  )
+  );
 
   if (isLoading) {
     return (
@@ -78,7 +67,7 @@ export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoT
               </TableRow>
             </TableHeader>
             <TableBody>
-              {renderSkeletonRows()} {/* Render skeleton rows when loading */}
+              {renderSkeletonRows()}
             </TableBody>
           </ScrollArea>
         </Table>
@@ -96,22 +85,22 @@ export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoT
               <TableHead className="w-[200px]">Name</TableHead>
               <TableHead className="w-[100px]">Ticker</TableHead>
               <TableHead className="text-right w-[120px]">
-                <Button variant="ghost" onClick={() => sortData('current_price')}>
+                <Button variant="ghost" onClick={() => onSort("current_price")}>
                   Price <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
               </TableHead>
               <TableHead className="text-right w-[120px]">
-                <Button variant="ghost" onClick={() => sortData('price_change_percentage_24h')}>
+                <Button variant="ghost" onClick={() => onSort("price_change_percentage_24h")}>
                   24h % <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
               </TableHead>
               <TableHead className="text-right w-[200px]">
-                <Button variant="ghost" onClick={() => sortData('market_cap')}>
+                <Button variant="ghost" onClick={() => onSort("market_cap")}>
                   Market Cap <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
               </TableHead>
               <TableHead className="text-right w-[200px]">
-                <Button variant="ghost" onClick={() => sortData('total_volume')}>
+                <Button variant="ghost" onClick={() => onSort("total_volume")}>
                   Volume (24h) <ArrowUpDown className="ml-2 h-4 w-4" />
                 </Button>
               </TableHead>
@@ -130,7 +119,7 @@ export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoT
                 </TableCell>
                 <TableCell>{crypto.symbol.toUpperCase()}</TableCell>
                 <TableCell className="text-right">${crypto.current_price.toLocaleString()}</TableCell>
-                <TableCell className={`text-right ${crypto.price_change_percentage_24h > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                <TableCell className={`text-right ${crypto.price_change_percentage_24h > 0 ? "text-green-500" : "text-red-500"}`}>
                   {crypto.price_change_percentage_24h.toFixed(2)}%
                 </TableCell>
                 <TableCell className="text-right">${crypto.market_cap.toLocaleString()}</TableCell>
@@ -143,5 +132,5 @@ export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoT
         </ScrollArea>
       </Table>
     </div>
-  )
+  );
 }
