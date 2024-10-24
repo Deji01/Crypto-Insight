@@ -1,33 +1,14 @@
 "use client";
 
-import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
+import { useQuery } from '@tanstack/react-query';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import Crypto from "@/lib/crypto";
 import { ArrowUpRight, ArrowDownRight, TrendingUp } from 'lucide-react';
 import Skeleton from './Skeleton';
 import ErrorComponent from './ErrorComponent';
-
-interface Data {
-  price_change_percentage_24h: PriceChange;
-}
-
-interface PriceChange {
-  usd: number;
-}
-
-interface Crypto {
-  item: {
-    id: string;
-    symbol: string;
-    name: string;
-    small: string;
-    market_cap_rank: number;
-    price_btc: number;
-    score: number;
-    data: Data;
-  };
-}
+import Image from 'next/image';
 
 const fetchTrendingCryptos = async () => {
   const response = await axios.get('/api/trending');
@@ -40,7 +21,6 @@ export default function TrendingPage() {
     queryFn: fetchTrendingCryptos
   });
 
-  // Render skeletons while loading
   if (isLoading) {
     return (
       <div className="space-y-6">
@@ -54,27 +34,27 @@ export default function TrendingPage() {
               <CardHeader className="pb-2">
                 <div className="flex justify-between items-center">
                   <div className="flex items-center space-x-2">
-                    <Skeleton className="w-8 h-8 rounded-full" /> {/* Placeholder for image */}
-                    <Skeleton className="w-24 h-6" /> {/* Placeholder for name */}
+                    <Skeleton className="w-8 h-8 rounded-full" />
+                    <Skeleton className="w-24 h-6" />
                   </div>
-                  <Skeleton className="w-10 h-6" /> {/* Placeholder for symbol */}
+                  <Skeleton className="w-10 h-6" />
                 </div>
               </CardHeader>
               <CardContent>
                 <div className="space-y-2">
                   <div className="flex justify-between items-center">
-                    <Skeleton className="w-24 h-4" /> {/* Placeholder for Market Cap Rank label */}
-                    <Skeleton className="w-12 h-4" /> {/* Placeholder for rank */}
+                    <Skeleton className="w-24 h-4" />
+                    <Skeleton className="w-12 h-4" />
                   </div>
                   <div className="flex justify-between items-center">
-                    <Skeleton className="w-24 h-4" /> {/* Placeholder for Price label */}
-                    <Skeleton className="w-12 h-4" /> {/* Placeholder for price */}
+                    <Skeleton className="w-24 h-4" />
+                    <Skeleton className="w-12 h-4" />
                   </div>
                   <div className="flex justify-between items-center">
-                    <Skeleton className="w-24 h-4" /> {/* Placeholder for Score label */}
-                    <Skeleton className="w-12 h-4" /> {/* Placeholder for score */}
+                    <Skeleton className="w-24 h-4" />
+                    <Skeleton className="w-12 h-4" />
                   </div>
-                  <Skeleton className="w-24 h-4" /> {/* Placeholder for 24h Change label */}
+                  <Skeleton className="w-24 h-4" />
                 </div>
               </CardContent>
             </Card>
@@ -105,7 +85,13 @@ export default function TrendingPage() {
             <CardHeader className="pb-2">
               <div className="flex justify-between items-center">
                 <div className="flex items-center space-x-2">
-                  <img src={crypto.item.small} alt={crypto.item.name} className="w-8 h-8" />
+                  {/* <img src={crypto.item.small} alt={crypto.item.name} className="w-8 h-8" /> */}
+                  <Image
+                    src={crypto.item.small}
+                    alt={crypto.item.name}
+                    width={8}
+                    height={8}
+                  />
                   <CardTitle>{crypto.item.name}</CardTitle>
                 </div>
                 <Badge variant="outline">{crypto.item.symbol}</Badge>
@@ -145,4 +131,4 @@ export default function TrendingPage() {
       </div>
     </div>
   );
-}
+};

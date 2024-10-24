@@ -6,7 +6,19 @@ import axios from "axios";
 import { Card, CardContent } from "@/components/ui/card";
 import CryptoTable from "../components/CryptoTable";
 import Pagination from "../components/Pagination";
-import AssetDetailsPage from "./AssetDetailsPage";
+import ErrorComponent from "./ErrorComponent";
+
+interface OldData {
+  id: string;
+  name: string;
+  symbol: string;
+  current_price: number;
+  price_change_percentage_24h: number;
+  market_cap: number;
+  total_volume: number;
+  circulating_supply: number;
+  [key: string]: string | number; // This allows for any additional string or number properties
+}
 
 const fetchCryptos = async (page = 1, perPage = 50) => {
   const response = await axios.get("/api/crypto", {
@@ -23,11 +35,11 @@ const fetchCryptos = async (page = 1, perPage = 50) => {
 
 export default function MarketsPage() {
   const [currentPage, setCurrentPage] = useState(1);
-  const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
+  // const [selectedAsset, setSelectedAsset] = useState<string | null>(null);
   const [sortConfig, setSortConfig] = useState({ key: "market_cap", direction: "descending" });
   const queryClient = useQueryClient();
 
-  const { data: cryptos, isLoading, isError } = useQuery({
+  const { data: cryptos, isLoading, isError, refetch } = useQuery({
     queryKey: ["cryptos", currentPage],
     queryFn: () => fetchCryptos(currentPage),
   });
@@ -36,7 +48,7 @@ export default function MarketsPage() {
     const newDirection = sortConfig.key === key && sortConfig.direction === "ascending" ? "descending" : "ascending";
     setSortConfig({ key, direction: newDirection });
 
-    queryClient.setQueryData(["cryptos", currentPage], (oldData: any[] | undefined) => {
+    queryClient.setQueryData(["cryptos", currentPage], (oldData: OldData[] | undefined) => {
       if (!oldData) return oldData;
       return [...oldData].sort((a, b) => {
         if (a[key] < b[key]) return newDirection === "ascending" ? -1 : 1;
@@ -46,16 +58,25 @@ export default function MarketsPage() {
     });
   };
 
-  const handleAssetClick = (id: string) => {
-    setSelectedAsset(id);
-  };
+  // const handleAssetClick = (id: string) => {
+  //   setSelectedAsset(id);
+  // };
 
-  const handleBackClick = () => {
-    setSelectedAsset(null);
-  };
+  // const handleBackClick = () => {
+  //   setSelectedAsset(null);
+  // };
 
-  if (selectedAsset) {
-    return <AssetDetailsPage assetId={selectedAsset} onBackClick={handleBackClick} />;
+  // if (selectedAsset) {
+  //   return <AssetDetailsPage assetId={selectedAsset} onBackClick={handleBackClick} />;
+  // }
+
+  if (isError) {
+    return (
+      <ErrorComponent
+        message="Error loading trending assets. Please try again later."
+        onRetry={() => refetch()}
+      />
+    );
   }
 
   return (

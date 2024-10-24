@@ -7,6 +7,7 @@ import { Button } from "@/components/ui/button";
 import CryptoTicker from './CryptoTicker';
 import LoadingSpinner from './LoadingSpinner';
 import Skeleton from './Skeleton';
+import Image from 'next/image';
 
 // NewsArticle Interface
 interface NewsArticle {
@@ -103,7 +104,7 @@ export default function NewsPage() {
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {news.map((article, index) => (
                   <Card key={index} className="overflow-hidden flex flex-col">
-                    <img
+                    {/* <img
                       src={article.urlToImage || placeholderImage} // Initial fallback if URL is null
                       onError={(e) => {
                         // Set the placeholder image if the image fails to load
@@ -111,6 +112,16 @@ export default function NewsPage() {
                       }}
                       alt={`Image for ${article.title}`}
                       className="w-full h-48 object-cover"
+                    /> */}
+                    <Image
+                      src={article.urlToImage || placeholderImage}
+                      onError={(e) => {
+                        // Set the placeholder image if the image fails to load
+                        e.currentTarget.src = placeholderImage;
+                      }}
+                      alt={`Image for ${article.title}`}
+                      height={48}
+                      className="w-full object-cover"
                     />
                     <CardContent className="flex-grow flex flex-col p-4">
                       <h3 className="font-bold text-lg mb-2 line-clamp-2">

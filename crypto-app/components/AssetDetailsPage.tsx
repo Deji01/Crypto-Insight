@@ -14,13 +14,13 @@ interface AssetDetailsPageProps {
 }
 
 // Define the type for OHLC data returned from the API
-interface OHLCData {
-    timestamp: number;
-    open: number;
-    high: number;
-    low: number;
-    close: number;
-}
+// interface OHLCData {
+//     timestamp: number;
+//     open: number;
+//     high: number;
+//     low: number;
+//     close: number;
+// }
 
 const fetchAssetDetails = async (id: string) => {
     const response = await axios.get(`${process.env.COIN_URL!}/${id}`);

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import axios from 'axios';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 
 interface Crypto {
     id: string
@@ -57,7 +58,13 @@ export default function CryptoTicker() {
             >
                 {cryptos.map((crypto: Crypto) => (
                     <div key={crypto.id} className="flex items-center space-x-2 mr-8">
-                        <img src={crypto.image} alt={crypto.name} className="w-6 h-6" />
+                        {/* <img src={crypto.image} alt={crypto.name} className="w-6 h-6" /> */}
+                        <Image
+                            src={crypto.image}
+                            alt={crypto.name}
+                            width={6}
+                            height={6}
+                        />
                         <span className="font-bold">{crypto.symbol.toUpperCase()}</span>
                         <span className={`${crypto.price_change_percentage_24h > 0 ? 'text-green-500' : 'text-red-500'}`}>
                             {crypto.price_change_percentage_24h.toFixed(2)}%

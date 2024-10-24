@@ -5,16 +5,31 @@ import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import Skeleton from "./Skeleton";
+import Image from "next/image";
 
 interface SortConfig {
   key: string;
   direction: string;
 }
 
+interface Cryptos {
+  id: string;
+  name: string;
+  symbol: string;
+  image: string;
+  current_price: number;
+  price_change_percentage_24h: number;
+  market_cap: number;
+  total_volume: number;
+  circulating_supply: number;
+}
+
 interface CryptoTableProps {
-  cryptos: any[];
+  cryptos: Cryptos[];
   isLoading: boolean;
   currentPage: number;
+  onSort: (key: string) => void;
+  sortConfig: SortConfig;
 }
 
 const CryptoTable = memo(({ cryptos, isLoading, currentPage }: CryptoTableProps) => {
@@ -31,10 +46,11 @@ const CryptoTable = memo(({ cryptos, isLoading, currentPage }: CryptoTableProps)
   const sortedCryptos = useMemo(() => {
     if (!cryptos) return [];
     return [...cryptos].sort((a, b) => {
-      if (a[sortConfig.key] < b[sortConfig.key]) {
+      const key = sortConfig.key as keyof Cryptos;  // Type assertion to access object properties
+      if (a[key] < b[key]) {
         return sortConfig.direction === 'ascending' ? -1 : 1;
       }
-      if (a[sortConfig.key] > b[sortConfig.key]) {
+      if (a[key] > b[key]) {
         return sortConfig.direction === 'ascending' ? 1 : -1;
       }
       return 0;
@@ -94,7 +110,14 @@ const CryptoTable = memo(({ cryptos, isLoading, currentPage }: CryptoTableProps)
                 <TableCell className="font-medium">{(currentPage - 1) * 50 + index + 1}</TableCell>
                 <TableCell className="font-medium">
                   <div className="flex items-center">
-                    <img src={crypto.image} alt={crypto.name} className="w-6 h-6 mr-2" />
+                    {/* <img src={crypto.image} alt={crypto.name} className="w-6 h-6 mr-2" /> */}
+                    <Image
+                      src={crypto.image}
+                      alt={crypto.name}
+                      width={6}
+                      height={6}
+                      className="mr-2"
+                    />
                     <span>{crypto.name}</span>
                   </div>
                 </TableCell>
@@ -114,5 +137,7 @@ const CryptoTable = memo(({ cryptos, isLoading, currentPage }: CryptoTableProps)
     </div>
   );
 });
+
+CryptoTable.displayName = 'CryptoTable';
 
 export default CryptoTable;
