@@ -9,6 +9,7 @@ import PortfolioPage from "@/components/PortfolioPage";
 import Header from "@/components/Header";
 import Footer from "@/components/Footer";
 import ErrorBoundary from "./ErrorBoundary";
+import SEO from "./SEO";
 
 const queryClient = new QueryClient()
 
@@ -16,6 +17,10 @@ export default function CryptoDashboard() {
   return (
     <QueryClientProvider client={queryClient}>
       <ErrorBoundary>
+        <SEO
+          title="CryptoInsight - Comprehensive Cryptocurrency Dashboard"
+          description="Real-time cryptocurrency market data, trending assets, and latest crypto news."
+        />
         <div className="bg-white text-black min-h-screen flex flex-col">
           <Header />
           <main className="container mx-auto p-4 flex-grow">

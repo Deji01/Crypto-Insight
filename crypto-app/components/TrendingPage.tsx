@@ -6,6 +6,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowUpRight, ArrowDownRight, TrendingUp } from 'lucide-react';
 import Skeleton from './Skeleton';
+import ErrorComponent from './ErrorComponent';
 
 interface Data {
   price_change_percentage_24h: PriceChange;
@@ -34,7 +35,7 @@ const fetchTrendingCryptos = async () => {
 };
 
 export default function TrendingPage() {
-  const { data: trendingCryptos, isLoading, isError } = useQuery({
+  const { data: trendingCryptos, isLoading, isError, refetch } = useQuery({
     queryKey: ['trendingCryptos'],
     queryFn: fetchTrendingCryptos
   });
@@ -85,9 +86,10 @@ export default function TrendingPage() {
 
   if (isError) {
     return (
-      <div className="flex justify-center items-center h-64">
-        Error loading trending assets. Please try again later.
-      </div>
+      <ErrorComponent
+        message="Error loading trending assets. Please try again later."
+        onRetry={() => refetch()}
+      />
     );
   }
 

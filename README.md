@@ -9,9 +9,9 @@ CryptoInsight is a comprehensive cryptocurrency dashboard built with Next.js, Re
 - Latest crypto news
 - Responsive design for mobile and desktop
 - Dark mode support
-
-## To-Do
 - Optimistic UI updates for improved user experience
+- Accessibility enhancements
+- SEO optimization
 
 ## Prerequisites
 
@@ -43,17 +43,25 @@ Before you begin, ensure you have met the following requirements:
 
    ```
    NEXT_PUBLIC_COINGECKO_API_URL=https://api.coingecko.com/api/v3
+   NEWS_API_KEY=your_news_api_key_here
    ```
 
 ## Running the Application
 
 To run the application in development mode:
 
-```
+```bash 
 npm run dev
 ```
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+## Testing
+
+To run the tests:
+```bash 
+npm test
+```
 
 ## Project Structure
 
@@ -61,6 +69,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - `/components`: Reusable React components
 - `/lib`: Utility functions and custom hooks
 - `/public`: Static assets
+- `/services`: API services
+- `/types`: TypeScript type definitions
 
 ## Key Components
 
@@ -70,6 +80,8 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - `NewsPage`: Displays latest crypto news
 - `CryptoTable`: Renders the table of cryptocurrencies
 - `CryptoTicker`: Scrolling ticker of top cryptocurrencies
+- `ErrorComponent`: Reusable error display component
+- `SEO`: Component for managing SEO meta tags
 
 ## Technologies Used
 
@@ -79,6 +91,7 @@ Open [http://localhost:3000](http://localhost:3000) with your browser to see the
 - [Axios](https://axios-http.com/): For making HTTP requests
 - [Framer Motion](https://www.framer.com/motion/): For animations
 - [Tailwind CSS](https://tailwindcss.com/): For styling
+- [Jest](https://jestjs.io/) and [React Testing Library](https://testing-library.com/docs/react-testing-library/intro/): For testing
 
 ## API Integration
 
@@ -87,6 +100,14 @@ This project uses the [CoinGecko API](https://www.coingecko.com/en/api/documenta
 ## Optimistic UI
 
 The application implements optimistic UI updates for improved user experience. This is particularly noticeable in the News and Trending pages, where new items are immediately displayed before the server confirms the update.
+
+## Accessibility
+
+The application follows WCAG guidelines to ensure it's accessible to all users. This includes proper use of ARIA labels, keyboard navigation support, and sufficient color contrast.
+
+## SEO
+
+The application uses Next.js's built-in features along with custom SEO components to ensure good search engine visibility.
 
 ## Contributing
 
@@ -97,6 +118,8 @@ Contributions to CryptoInsight are welcome! Please follow these steps:
 3. Make your changes and commit them: `git commit -m 'Add some feature'`
 4. Push to the branch: `git push origin feature-name`
 5. Submit a pull request
+
+Please ensure your code adheres to the existing style and passes all tests.
 
 ## License
 

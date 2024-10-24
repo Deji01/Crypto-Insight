@@ -1,10 +1,9 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useState, useMemo, memo } from "react";
 import { ArrowUpDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
-import { ScrollArea, ScrollBar } from "@/components/ui/scroll-area";
 import Skeleton from "./Skeleton";
 
 interface SortConfig {
@@ -16,20 +15,10 @@ interface CryptoTableProps {
   cryptos: any[];
   isLoading: boolean;
   currentPage: number;
-  onSort: (key: string) => void;
-  sortConfig: SortConfig;
 }
 
-export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoTableProps) {
-  const [sortConfig, setSortConfig] = useState({ key: 'market_cap', direction: 'descending' });
-
-  // Prevent SSR mismatch by ensuring sorting only happens on client-side
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      // Client-side sorting logic
-      setSortConfig({ key: 'market_cap', direction: 'descending' });
-    }
-  }, []);
+const CryptoTable = memo(({ cryptos, isLoading, currentPage }: CryptoTableProps) => {
+  const [sortConfig, setSortConfig] = useState<SortConfig>({ key: 'market_cap', direction: 'descending' });
 
   const sortData = (key: string) => {
     let direction = 'ascending';
@@ -52,7 +41,6 @@ export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoT
     });
   }, [cryptos, sortConfig]);
 
-  // Skeleton loading state
   const renderSkeletonRows = () => (
     [...Array(10)].map((_, index) => (
       <TableRow key={index}>
@@ -68,66 +56,40 @@ export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoT
     ))
   );
 
-  if (isLoading) {
-    return (
-      <div className="flex justify-center items-center overflow-auto max-w-full">
-        <Table>
-          <ScrollArea>
-            <TableHeader>
-              <TableRow>
-                <TableHead className="w-[60px]">Rank</TableHead>
-                <TableHead className="w-[200px]">Name</TableHead>
-                <TableHead className="w-[100px]">Ticker</TableHead>
-                <TableHead className="text-right w-[120px]">Price</TableHead>
-                <TableHead className="text-right w-[120px]">24h %</TableHead>
-                <TableHead className="text-right w-[200px]">Market Cap</TableHead>
-                <TableHead className="text-right w-[200px]">Volume (24h)</TableHead>
-                <TableHead className="text-right w-[200px]">Circulating Supply</TableHead>
-              </TableRow>
-            </TableHeader>
-            <TableBody>
-              {renderSkeletonRows()} {/* Render skeleton rows when loading */}
-            </TableBody>
-          </ScrollArea>
-        </Table>
-      </div>
-    );
-  }
-
   return (
-    <div className="flex justify-center items-center overflow-auto max-w-full">
+    <div className="w-full overflow-auto">
       <Table>
-        <ScrollArea>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[60px]">Rank</TableHead>
-              <TableHead className="w-[200px]">Name</TableHead>
-              <TableHead className="w-[100px]">Ticker</TableHead>
-              <TableHead className="text-right w-[120px]">
-                <Button variant="ghost" onClick={() => sortData('current_price')}>
-                  Price <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-              </TableHead>
-              <TableHead className="text-right w-[120px]">
-                <Button variant="ghost" onClick={() => sortData('price_change_percentage_24h')}>
-                  24h % <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-              </TableHead>
-              <TableHead className="text-right w-[200px]">
-                <Button variant="ghost" onClick={() => sortData('market_cap')}>
-                  Market Cap <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-              </TableHead>
-              <TableHead className="text-right w-[200px]">
-                <Button variant="ghost" onClick={() => sortData('total_volume')}>
-                  Volume (24h) <ArrowUpDown className="ml-2 h-4 w-4" />
-                </Button>
-              </TableHead>
-              <TableHead className="text-right w-[200px]">Circulating Supply</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {sortedCryptos.map((crypto, index) => (
+        <TableHeader>
+          <TableRow>
+            <TableHead className="w-[60px]">Rank</TableHead>
+            <TableHead className="w-[200px]">Name</TableHead>
+            <TableHead className="w-[100px]">Ticker</TableHead>
+            <TableHead className="text-right w-[120px]">
+              <Button variant="ghost" onClick={() => sortData('current_price')} aria-label="Sort by Price">
+                Price <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            </TableHead>
+            <TableHead className="text-right w-[120px]">
+              <Button variant="ghost" onClick={() => sortData('price_change_percentage_24h')} aria-label="Sort by 24h %">
+                24h % <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            </TableHead>
+            <TableHead className="text-right w-[200px]">
+              <Button variant="ghost" onClick={() => sortData('market_cap')} aria-label="Sort by Market Cap">
+                Market Cap <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            </TableHead>
+            <TableHead className="text-right w-[200px]">
+              <Button variant="ghost" onClick={() => sortData('total_volume')} aria-label="Sort by Volume (24h)">
+                Volume (24h) <ArrowUpDown className="ml-2 h-4 w-4" />
+              </Button>
+            </TableHead>
+            <TableHead className="text-right w-[200px]">Circulating Supply</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
+          {isLoading ? renderSkeletonRows() : (
+            sortedCryptos.map((crypto, index) => (
               <TableRow key={crypto.id}>
                 <TableCell className="font-medium">{(currentPage - 1) * 50 + index + 1}</TableCell>
                 <TableCell className="font-medium">
@@ -145,11 +107,12 @@ export default function CryptoTable({ cryptos, isLoading, currentPage }: CryptoT
                 <TableCell className="text-right">${crypto.total_volume.toLocaleString()}</TableCell>
                 <TableCell className="text-right">{crypto.circulating_supply.toLocaleString()} {crypto.symbol.toUpperCase()}</TableCell>
               </TableRow>
-            ))}
-          </TableBody>
-          <ScrollBar orientation="horizontal" />
-        </ScrollArea>
+            ))
+          )}
+        </TableBody>
       </Table>
     </div>
   );
-}
+});
+
+export default CryptoTable;
